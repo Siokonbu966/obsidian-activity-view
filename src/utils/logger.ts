@@ -87,8 +87,6 @@ export class Logger {
    */
   clear(): void {
     this.logs = [];
-    this.emit('clear');
-    // clearイベントの後にupdateイベントも発火（UI更新のため）
     this.emit('update');
   }
 

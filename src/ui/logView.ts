@@ -34,6 +34,11 @@ export class LogView extends ItemView {
     container.empty();
 
     // ログ内容表示
+    const debugInfo = container.createEl("div", {
+      text: `リスナー数： ${this.logger.getListenerCount('update')}`,
+      cls: "debug-info"
+    })
+
     const logBox = container.createEl("textarea", {
       cls: "debug-log-box",
       attr: { readonly: "true", rows: 20, style: "width:100%;" },

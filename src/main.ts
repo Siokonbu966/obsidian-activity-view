@@ -74,10 +74,15 @@ export default class MyPlugin extends Plugin {
 			id: 'debug-log-view',
 			name: 'open debug view',
 			callback: () => {
-				this.app.workspace.getLeaf(true).setViewState({
-					type: VIEW_TYPE_LOG,
-					active: true,
-				});
+				const existingLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_LOG)[0];
+				if (existingLeaf) {
+					this.app.workspace.setActiveLeaf(existingLeaf);
+				} else {
+					this.app.workspace.getLeaf(true).setViewState({
+						type: VIEW_TYPE_LOG,
+						active: true,
+					});
+				};
 			},
 		});
 
@@ -100,7 +105,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	onunload() {
-
+		this.logger.clearListeners();
 	}
 
 	async loadSettings() {
