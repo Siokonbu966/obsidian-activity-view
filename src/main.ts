@@ -1,4 +1,6 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Logger } from './utils/logger';
+import { LogView, VIEW_TYPE_LOG } from './ui/logView';
 
 // Remember to rename these classes and interfaces!
 
@@ -13,6 +15,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
+	logger = new Logger();
+
 	async onload() {
 		await this.loadSettings();
 
@@ -20,6 +24,7 @@ export default class MyPlugin extends Plugin {
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
 			new Notice('This is a notice!');
+			this.logger.log('push dice button')
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
@@ -64,6 +69,22 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 		});
+
+		this.addCommand({
+			id: 'debug-log-view',
+			name: 'open debug view',
+			callback: () => {
+				this.app.workspace.getLeaf(true).setViewState({
+					type: VIEW_TYPE_LOG,
+					active: true,
+				});
+			},
+		});
+
+		this.registerView(
+			VIEW_TYPE_LOG,
+			(leaf) => new LogView(leaf, this.logger)
+		);
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
