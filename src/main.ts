@@ -24,9 +24,23 @@ export default class ActivityView extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("editor-change", () => {
-				this.updateStatusBar();
+				this.handleEditorChange();
 			}),
 		);
+	}
+
+	private handleEditorChange() {
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (!view || !view.editor) {
+			return;
+		}
+
+		const editor = view.editor;
+		const currentContent = editor.getValue();
+
+		this.sessionTracker.updateFormContent(currentContent);
+
+		this.updateStatusBar();
 	}
 
 	private updateStatusBar() {
@@ -40,7 +54,16 @@ export default class ActivityView extends Plugin {
 		);
 	}
 
-	private resetSession() {}
+	private resetSession() {
+		this.settings.lastSessionStats = {
+			added: this.sessionTracker.addedCharacters,
+			deleted: this.sessionTracker.deletedCharacters,
+			date: new Date().toISOString(),
+		};
+
+		this.sessionTracker.reset();
+		this.updateStatusBar();
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(

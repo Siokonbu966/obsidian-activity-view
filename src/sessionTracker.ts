@@ -11,7 +11,12 @@ export class SessionTracker {
 	updateFormContent(currentContent: string) {
 		const currentLength = currentContent.length;
 		const lastLength = this.lastContent.length;
-		const difference = currentLength - lastLength;
+		let difference = 0;
+		if (lastLength > 0) {
+			difference = currentLength - lastLength;
+		} else {
+			difference = 1;
+		}
 
 		if (difference > 0) {
 			this.addedCharacters += difference;
