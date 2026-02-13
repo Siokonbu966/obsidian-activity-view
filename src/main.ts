@@ -18,7 +18,7 @@ export default class ActivityView extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("file-open", () => {
-				this.resetSession();
+				this.handleSessionEnd();
 			}),
 		);
 
@@ -65,11 +65,51 @@ export default class ActivityView extends Plugin {
 		this.updateStatusBar();
 	}
 
+	private async handleSessionEnd() {
+		// JSONに記録してからセッションをリセット
+		await this.writeLog();
+		this.resetSession();
+	}
+
 	async loadSettings() {
 		this.settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
 			(await this.loadData()) as Partial<MyPluginSettings>,
 		);
+	}
+
+	async writeLog() {
+		const sessionData = {
+			added: this.sessionTracker.addedCharacters,
+			deleted: this.sessionTracker.deletedCharacters,
+			timestamp: new Date().toISOString(),
+		};
+
+		try {
+			const dataPath = 'data.json';
+			let allData: any[] = [];
+
+			// 既存ファイルを読み込む
+			try {
+				const fileContent = await this.app.vault.adapter.read(dataPath);
+				allData = JSON.parse(fileContent);
+				if (!Array.isArray(allData)) {
+					allData = [];
+				}
+			} catch {
+				// ファイルが存在しない場合は新規作成
+				allData = [];
+			}
+
+			// 新しいセッションデータを追加
+			allData.push(sessionData);
+
+			// ファイルに書き込む
+			await this.app.vault.adapter.write(dataPath, JSON.stringify(allData, null, 2));
+			console.log('Session data saved successfully', sessionData);
+		} catch (err) {
+			console.error('Error writing session data', err);
+		}
 	}
 }
