@@ -87,7 +87,7 @@ export default class ActivityView extends Plugin {
 		};
 
 		try {
-			const dataPath = 'data.json';
+			const dataPath = `${this.manifest.dir}/data.json`;
 			let allData: any[] = [];
 
 			// 既存ファイルを読み込む
