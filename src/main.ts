@@ -1,6 +1,7 @@
 import { MarkdownView, Plugin } from "obsidian";
 import { MyPluginSettings, DEFAULT_SETTINGS } from "./settings";
 import { SessionTracker } from "./sessionTracker";
+import { ActivityDashboardView, VIEW_TYPE_ACTIVITY } from "./view";
 
 export default class ActivityView extends Plugin {
 	settings: MyPluginSettings;
@@ -16,6 +17,26 @@ export default class ActivityView extends Plugin {
 		// init statusBarEld
 		this.statusBarEl = this.addStatusBarItem();
 
+		// Register the dashboard view
+		this.registerView(
+			VIEW_TYPE_ACTIVITY,
+			(leaf) => new ActivityDashboardView(leaf, this)
+		);
+
+		// Add ribbon icon to open dashboard
+		this.addRibbonIcon("bar-chart-2", "Activity Dashboard", () => {
+			this.activateDashboardView();
+		});
+
+		// Add command to open dashboard
+		this.addCommand({
+			id: "open-activity-dashboard",
+			name: "Open Activity Dashboard",
+			callback: () => {
+				this.activateDashboardView();
+			},
+		});
+
 		this.registerEvent(
 			this.app.workspace.on("file-open", () => {
 				this.handleSessionEnd();
@@ -27,6 +48,25 @@ export default class ActivityView extends Plugin {
 				this.handleEditorChange();
 			}),
 		);
+	}
+
+	async activateDashboardView() {
+		const { workspace } = this.app;
+
+		let leaf = workspace.getLeavesOfType(VIEW_TYPE_ACTIVITY)[0];
+
+		if (!leaf) {
+			// メインエディターエリアに新しいタブとして開く
+			leaf = workspace.getLeaf('tab');
+			await leaf.setViewState({
+				type: VIEW_TYPE_ACTIVITY,
+				active: true,
+			});
+		}
+
+		if (leaf) {
+			workspace.revealLeaf(leaf);
+		}
 	}
 
 	private handleEditorChange() {
@@ -111,5 +151,9 @@ export default class ActivityView extends Plugin {
 		} catch (err) {
 			console.error('Error writing session data', err);
 		}
+	}
+
+	async onunload() {
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_ACTIVITY);
 	}
 }
