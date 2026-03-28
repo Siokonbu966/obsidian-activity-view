@@ -20,8 +20,27 @@
 /* Heatmap Styles */
 .activity-heatmap {
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
-	align-items: center;
+	align-items: flex-start;
+}
+
+/* Month Labels Row */
+.heatmap-month-row {
+	display: flex;
+	gap: 3px;
+	margin-bottom: 5px;
+}
+
+.heatmap-month-spacer {
+	width: 45px;
+}
+
+.heatmap-month-label {
+	width: 40px;
+	font-size: 12px;
+	color: var(--text-muted);
+	text-align: left;
 }
 
 .heatmap-grid {
@@ -39,7 +58,7 @@
 .heatmap-weekday-label {
 	width: 40px;
 	height: 40px;
-	font-size: 40px;
+	font-size: 12px;
 	color: var(--text-muted);
 	display: flex;
 	align-items: center;
@@ -86,5 +105,20 @@
 	.heatmap-cell {
 		width: 10px;
 		height: 10px;
+	}
+
+	.heatmap-weekday-label {
+		width: 10px;
+		height: 10px;
+		font-size: 8px;
+	}
+
+	.heatmap-month-label {
+		width: 10px;
+		font-size: 8px;
+	}
+
+	.heatmap-month-spacer {
+		width: 15px;
 	}
 }
