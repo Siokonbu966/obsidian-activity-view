@@ -27,7 +27,7 @@ jobs:
             - name: Prepare files
               run: |
                   mkdir release
-                  cp main.js manifest.json style.css release/
+                  cp main.js manifest.json styles.css release/
 
             - name: Zip
               run: |
